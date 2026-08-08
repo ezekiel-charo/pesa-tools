@@ -1,20 +1,35 @@
-import { CloudArrowUpIcon } from '@heroicons/react/24/outline';
-import { useState, type ChangeEvent } from 'react';
+import { ArrowPathIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
+import { use, useState, type ChangeEvent } from 'react';
 import { processStatements } from '../core/pdf';
+import { GlobalStateContext } from '../GlobalStateContext';
 import SelectedFileList from './SelectedFileList';
+import { useNavigate } from 'react-router';
 
 export default function Upload() {
+  const { setTransactions } = use(GlobalStateContext);
   const [btnDisabled, setBtnDisabled] = useState<boolean>(true);
   const [files, setFiles] = useState<FileList | null>();
+  const navigate = useNavigate();
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFiles(e.target.files);
-    setBtnDisabled(false);
+    if (e.target.files?.length) {
+      setFiles(e.target.files);
+      setBtnDisabled(false);
+    }
   };
 
-  const analyseStatements = () => {
+  const analyseStatements = async () => {
     if (!files?.length) return;
-    processStatements(files);
+    setBtnDisabled(true);
+
+    try {
+      const transactions = await processStatements(files);
+      setTransactions(transactions);
+      navigate('insights');
+    } catch (e) {
+      setBtnDisabled(false);
+      console.error(e);
+    }
   };
 
   return (
@@ -38,9 +53,16 @@ export default function Upload() {
       <button
         onClick={analyseStatements}
         disabled={btnDisabled}
-        className="bg-primary disabled:bg-gray-400 text-white py-2 px-6 rounded-lg font-medium cursor-pointer"
+        className="flex items-center bg-primary disabled:bg-gray-400 text-white py-2 px-6 rounded-lg font-medium cursor-pointer"
       >
-        Analyse
+        {files && btnDisabled ? (
+          <>
+            <ArrowPathIcon className="size-4 animate-spin me-1" />
+            Processing...
+          </>
+        ) : (
+          'Analyse'
+        )}
       </button>
     </>
   );
