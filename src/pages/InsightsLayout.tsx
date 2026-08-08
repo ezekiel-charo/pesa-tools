@@ -1,9 +1,9 @@
 import { Link, Outlet } from 'react-router';
 
-export default function AnalysisLayout() {
+export default function InsightsLayout() {
   return (
     <>
-      <Link to="">Summary</Link>
+      <Link to="">Insights</Link>
       <Link to="transactions">Transactions</Link>
       <Outlet />
     </>

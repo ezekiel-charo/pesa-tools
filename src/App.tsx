@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
-import AnalysisLayout from './pages/AnalysisLayout';
 import Home from './pages/Home';
-import Summary from './pages/Summary';
+import Insights from './pages/Insights';
+import InsightsLayout from './pages/InsightsLayout';
 import Transactions from './pages/Transactions';
 
 export default function App() {
@@ -9,8 +9,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route index Component={Home} />
-        <Route path="analysis" Component={AnalysisLayout}>
-          <Route index Component={Summary} />
+        <Route path="insights" Component={InsightsLayout}>
+          <Route index Component={Insights} />
           <Route path="transactions" Component={Transactions} />
         </Route>
       </Routes>
