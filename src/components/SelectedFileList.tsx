@@ -8,7 +8,10 @@ export default function SelectedFileList({
   const list = [];
   for (const file of files) {
     list.push(
-      <div className="flex justify-between py-2 border-b border-gray-200">
+      <div
+        key={file.name}
+        className="flex justify-between py-2 border-b border-gray-200"
+      >
         <span className="font-medium text-sm text-gray-700">
           {file.name.slice(0, 35)}
           {file.name.length > 35 ? '...' : ''}
