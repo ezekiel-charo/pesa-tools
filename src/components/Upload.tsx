@@ -19,7 +19,7 @@ export default function Upload() {
 
   return (
     <>
-      <label className="mb-6 cursor-pointer inline-flex flex-col items-center w-120 p-6 rounded-lg border-2 border-dotted border-gray-700 bg-gray-100">
+      <label className="mb-6 cursor-pointer inline-flex flex-col items-center w-120 p-6 rounded-lg border-2 border-dotted border-gray-700 bg-slate-100">
         <CloudArrowUpIcon className="size-12 text-gray-500" />
         <div className="font-medium my-1">
           Click to choose or drag and drop your files
