@@ -1,4 +1,5 @@
-export interface Transaction {
+interface MpesaTransaction {
+  id: string;
   transactionNo: string;
   completionTime: string;
   details: string;
@@ -7,3 +8,5 @@ export interface Transaction {
   withdrawn: number | null;
   balance: number;
 }
+
+export type { MpesaTransaction };

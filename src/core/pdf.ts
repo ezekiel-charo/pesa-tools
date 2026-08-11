@@ -1,17 +1,14 @@
 import { PDFParse } from 'pdf-parse';
-import type { Transaction } from '../types/transaction';
-//// Available Worker Files
-// pdf.worker.mjs
-// pdf.worker.min.mjs
-// If you use a custom build or host pdf.worker.mjs yourself, configure worker accordingly.
+import type { MpesaTransaction } from '../types/mpesa-transaction';
+
 PDFParse.setWorker(
   'https://cdn.jsdelivr.net/npm/pdf-parse@latest/dist/pdf-parse/web/pdf.worker.mjs'
 );
 
 export async function extractTransactions(
   pdfFileData: ArrayBuffer
-): Promise<Transaction[]> {
-  const transactions: Transaction[] = [];
+): Promise<MpesaTransaction[]> {
+  const transactions: MpesaTransaction[] = [];
   const parser = new PDFParse({ data: pdfFileData });
   const tableResult = await parser.getTable();
 
@@ -28,7 +25,7 @@ export async function extractTransactions(
           return;
         }
 
-        const txn: Transaction = {
+        const txn = {
           transactionNo: row[0],
           completionTime: row[1],
           details: row[2],
@@ -36,7 +33,7 @@ export async function extractTransactions(
           paidIn: parseFloat(row[4].replace(/,/g, '')) || null,
           withdrawn: parseFloat(row[5].replace(/,/g, '')) || null,
           balance: parseFloat(row[6].replace(/,/g, '')),
-        };
+        } as MpesaTransaction;
         transactions.push(txn);
       });
     });
@@ -63,8 +60,8 @@ export function readFileAsync(file: File): Promise<ArrayBuffer> {
 
 export async function processStatements(
   files: FileList
-): Promise<Transaction[]> {
-  const transactions: Transaction[] = [];
+): Promise<MpesaTransaction[]> {
+  const transactions: MpesaTransaction[] = [];
 
   for (const file of files) {
     const fileData = await readFileAsync(file);

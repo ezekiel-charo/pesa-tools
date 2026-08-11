@@ -1,9 +1,9 @@
 import { createContext, useState, type ReactNode } from 'react';
-import type { Transaction } from './types/transaction';
+import type { MpesaTransaction } from './types/mpesa-transaction';
 
 interface GlobalState {
-  transactions: Transaction[] | null;
-  setTransactions: (t: Transaction[]) => void;
+  transactions: MpesaTransaction[] | null;
+  setTransactions: (t: MpesaTransaction[]) => void;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -17,7 +17,7 @@ interface GlobalStateProviderProps {
 }
 
 export function GlobalStateProvider({ children }: GlobalStateProviderProps) {
-  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
+  const [transactions, setTransactions] = useState<MpesaTransaction[] | null>(null);
 
   return (
     <GlobalStateContext value={{ transactions, setTransactions }}>
