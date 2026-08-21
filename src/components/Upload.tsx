@@ -1,12 +1,11 @@
 import { ArrowPathIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
-import { use, useState, type ChangeEvent } from 'react';
-import { processStatements } from '../core/data-extraction';
-import { GlobalStateContext } from '../GlobalStateContext';
-import SelectedFileList from './SelectedFileList';
+import { useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router';
+import { processStatements } from '../core/data-extraction';
+import { db } from '../core/db';
+import SelectedFileList from './SelectedFileList';
 
 export default function Upload() {
-  const { setTransactions } = use(GlobalStateContext);
   const [btnDisabled, setBtnDisabled] = useState<boolean>(true);
   const [files, setFiles] = useState<FileList | null>();
   const navigate = useNavigate();
@@ -24,7 +23,7 @@ export default function Upload() {
 
     try {
       const data = await processStatements(files);
-      setTransactions(data.transactions);
+      db.mpesaTransactions.bulkAdd(data.transactions);
       navigate('insights');
     } catch (e) {
       setBtnDisabled(false);
