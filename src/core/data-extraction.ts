@@ -55,20 +55,20 @@ export async function extractStatementData(
 
   // Get unique counterparties
   counterParties = Array.from(
-    new Map(counterParties.map((party) => [party.partyNumber, party])).values()
+    new Map(
+      counterParties.map((party) => [party.counterPartyNumber, party])
+    ).values()
   );
 
   return { transactions, counterParties };
 }
 
 export function getTransactionType(details: string): MpesaTransactionType {
-  //TODO:
-  return 'OTHER';
+  return 'OTHER'; // TODO: Implement
 }
 
 export function getCounterparty(details: string): CounterParty | undefined {
-  //TODO:
-  return;
+  return; // TODO: Implement
 }
 
 export function readFileAsync(file: File): Promise<ArrayBuffer> {
