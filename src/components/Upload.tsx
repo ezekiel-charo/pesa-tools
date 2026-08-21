@@ -1,6 +1,6 @@
 import { ArrowPathIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
 import { use, useState, type ChangeEvent } from 'react';
-import { processStatements } from '../core/pdf';
+import { processStatements } from '../core/data-extraction';
 import { GlobalStateContext } from '../GlobalStateContext';
 import SelectedFileList from './SelectedFileList';
 import { useNavigate } from 'react-router';
@@ -23,8 +23,8 @@ export default function Upload() {
     setBtnDisabled(true);
 
     try {
-      const transactions = await processStatements(files);
-      setTransactions(transactions);
+      const data = await processStatements(files);
+      setTransactions(data.transactions);
       navigate('insights');
     } catch (e) {
       setBtnDisabled(false);

@@ -1,16 +1,21 @@
 import { PDFParse } from 'pdf-parse';
 import type { MpesaTransaction } from '../types/mpesa-transaction';
+import type { MpesaTransactionType } from '../types/mpesa-transaction-type';
+import type { CounterParty } from '../types/counter-party';
+import type { StatementData } from '../types/statement-data';
 
 PDFParse.setWorker(
   'https://cdn.jsdelivr.net/npm/pdf-parse@latest/dist/pdf-parse/web/pdf.worker.mjs'
 );
 
-export async function extractTransactions(
+export async function extractStatementData(
   pdfFileData: ArrayBuffer
-): Promise<MpesaTransaction[]> {
-  const transactions: MpesaTransaction[] = [];
+): Promise<StatementData> {
   const parser = new PDFParse({ data: pdfFileData });
   const tableResult = await parser.getTable();
+
+  const transactions: MpesaTransaction[] = [];
+  let counterParties: CounterParty[] = [];
 
   tableResult.pages.forEach((page, pageIndex) => {
     page.tables.forEach((table, tableIndex) => {
@@ -27,19 +32,43 @@ export async function extractTransactions(
 
         const txn = {
           transactionNo: row[0],
-          completionTime: row[1],
+          completionTime: Date.parse(row[1]),
+          transactionType: getTransactionType(row[2]),
           details: row[2],
+          isCharge: row[2].includes('Charge'),
           transactionStatus: row[3],
           paidIn: parseFloat(row[4].replace(/,/g, '')) || null,
           withdrawn: parseFloat(row[5].replace(/,/g, '')) || null,
           balance: parseFloat(row[6].replace(/,/g, '')),
         } as MpesaTransaction;
+
         transactions.push(txn);
+
+        const counterParty = getCounterparty(txn.details);
+
+        if (counterParty) {
+          counterParties.push(counterParty);
+        }
       });
     });
   });
 
-  return transactions;
+  // Get unique counterparties
+  counterParties = Array.from(
+    new Map(counterParties.map((party) => [party.partyNumber, party])).values()
+  );
+
+  return { transactions, counterParties };
+}
+
+export function getTransactionType(details: string): MpesaTransactionType {
+  //TODO:
+  return 'OTHER';
+}
+
+export function getCounterparty(details: string): CounterParty | undefined {
+  //TODO:
+  return;
 }
 
 export function readFileAsync(file: File): Promise<ArrayBuffer> {
@@ -60,14 +89,16 @@ export function readFileAsync(file: File): Promise<ArrayBuffer> {
 
 export async function processStatements(
   files: FileList
-): Promise<MpesaTransaction[]> {
+): Promise<StatementData> {
   const transactions: MpesaTransaction[] = [];
+  const counterParties: CounterParty[] = [];
 
   for (const file of files) {
     const fileData = await readFileAsync(file);
-    const txns = await extractTransactions(fileData);
-    transactions.push(...txns);
+    const data = await extractStatementData(fileData);
+    transactions.push(...data.transactions);
+    counterParties.push(...data.counterParties);
   }
 
-  return transactions;
+  return { transactions, counterParties };
 }
