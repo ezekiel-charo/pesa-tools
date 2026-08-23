@@ -1,16 +1,9 @@
-import { WrenchIcon } from '@heroicons/react/24/outline';
+import Logo from './Logo';
 
 export default function Header() {
   return (
     <header className="flex justify-between items-center bg-gray-100 py-4 px-4 lg:px-18 border-b border-gray-200">
-      <div className="font-extrabold">
-        <span className="font-cal-sanss text-primary text-3xl me-1">
-          Pesatools
-        </span>
-        <span className=" bg-primary inline-flex items-center justify-center size-8 text-white rounded-lg">
-          <WrenchIcon className="size-5" />
-        </span>
-      </div>
+      <Logo />
       <a href="https://github.com/ezekiel-charo/pesa-tools" target="_blank">
         <svg
           fill="#000000"
