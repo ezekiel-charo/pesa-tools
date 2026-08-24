@@ -8,7 +8,8 @@
     "test": "jest",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -35,6 +36,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "eslint-plugin-react-x": "^5.16.1",
+    "gh-pages": "^6.3.0",
     "globals": "^17.7.0",
     "jest": "^30.4.2",
     "prettier": "^3.9.5",
