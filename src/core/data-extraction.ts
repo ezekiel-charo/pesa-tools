@@ -1,8 +1,12 @@
 import { PDFParse } from 'pdf-parse';
+import type { CounterParty } from '../types/counter-party';
 import type { MpesaTransaction } from '../types/mpesa-transaction';
 import type { MpesaTransactionType } from '../types/mpesa-transaction-type';
-import type { CounterParty } from '../types/counter-party';
 import type { StatementData } from '../types/statement-data';
+import {
+  CASH_FLOW_TYPES,
+  type CashFlowSummary,
+} from '../types/CashFlowSummary';
 
 PDFParse.setWorker(
   'https://cdn.jsdelivr.net/npm/pdf-parse@latest/dist/pdf-parse/web/pdf.worker.mjs'
@@ -13,14 +17,25 @@ export async function extractStatementData(
 ): Promise<StatementData> {
   const parser = new PDFParse({ data: pdfFileData });
   const tableResult = await parser.getTable();
-
   const transactions: MpesaTransaction[] = [];
-  let counterParties: CounterParty[] = [];
+  let summary: CashFlowSummary | null = null;
 
   tableResult.pages.forEach((page, pageIndex) => {
     page.tables.forEach((table, tableIndex) => {
       if (pageIndex === 0 && tableIndex === 0) {
-        // Skip the summary table (first table on the first page)
+        // Read summary table (first table on the first page)
+        summary = Object.fromEntries(
+          CASH_FLOW_TYPES.map((t, i) => {
+            return [
+              t,
+              {
+                paidIn: parseFloat(table[i + 1][1].replace(/,/g, '')),
+                paidOut: parseFloat(table[i + 1][2].replace(/,/g, '')),
+              },
+            ];
+          })
+        ) as CashFlowSummary;
+
         return;
       }
 
@@ -42,33 +57,40 @@ export async function extractStatementData(
           balance: parseFloat(row[6].replace(/,/g, '')),
         } as MpesaTransaction;
 
-        transactions.push(txn);
-
         const counterParty = getCounterparty(txn.details);
+        txn.counterParty = counterParty;
+        txn.counterPartyNumber = counterParty?.counterPartyNumber;
 
-        if (counterParty) {
-          counterParties.push(counterParty);
-        }
+        transactions.push(txn);
       });
     });
   });
 
-  // Get unique counterparties
-  counterParties = Array.from(
-    new Map(
-      counterParties.map((party) => [party.counterPartyNumber, party])
-    ).values()
-  );
-
-  return { transactions, counterParties };
+  return { transactions, summary };
 }
 
 export function getTransactionType(details: string): MpesaTransactionType {
+  console.log(details);
   return 'OTHER'; // TODO: Implement
 }
 
 export function getCounterparty(details: string): CounterParty | undefined {
+  console.log(details);
   return; // TODO: Implement
+}
+
+export function mergeSummaries(summaries: CashFlowSummary[]): CashFlowSummary {
+  const result = {} as CashFlowSummary;
+
+  for (const summary of summaries) {
+    for (const type of CASH_FLOW_TYPES) {
+      result[type] ??= { paidIn: 0, paidOut: 0 };
+      result[type].paidIn += summary[type].paidIn;
+      result[type].paidOut += summary[type].paidOut;
+    }
+  }
+
+  return result;
 }
 
 export function readFileAsync(file: File): Promise<ArrayBuffer> {
@@ -91,14 +113,17 @@ export async function processStatements(
   files: FileList
 ): Promise<StatementData> {
   const transactions: MpesaTransaction[] = [];
-  const counterParties: CounterParty[] = [];
+  const summaries: CashFlowSummary[] = [];
 
   for (const file of files) {
     const fileData = await readFileAsync(file);
     const data = await extractStatementData(fileData);
     transactions.push(...data.transactions);
-    counterParties.push(...data.counterParties);
+    if (data.summary) {
+      summaries.push(data.summary);
+    }
   }
 
-  return { transactions, counterParties };
+  const summary = mergeSummaries(summaries);
+  return { transactions, summary };
 }

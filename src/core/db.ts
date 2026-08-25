@@ -11,8 +11,8 @@ const db = new Dexie('mpesaTransactionsDb') as Dexie & {
 db.version(1).stores({
   // TODO: Create multiple "tables" e.g. transactions, people, transactionType etc
   mpesaTransactions:
-    '++id, transactionNo, transactionType, completionTime, details, isCharge, transactionStatus, paidIn, withdrawn, balance, counterPartyNumber, counterPartyName',
-  counterParties: '++counterPartyNumber, counterPartyName',
+    '++id, transactionNo, transactionType, completionTime, details, isCharge, transactionStatus, paidIn, withdrawn, balance, counterPartyNumber',
+  counterParties: '++id, counterPartyNumber, counterPartyName, accountNumber',
 });
 
 export { db };

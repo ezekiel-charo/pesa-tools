@@ -1,4 +1,6 @@
 export interface CounterParty {
+  id: number;
+
   /**
    * Paybill, till or phone number
    */
