@@ -5,6 +5,7 @@ import type { CounterParty } from '../types/counter-party';
 const db = new Dexie('mpesaTransactionsDb') as Dexie & {
   mpesaTransactions: EntityTable<MpesaTransaction, 'id'>;
   counterParties: EntityTable<CounterParty, 'counterPartyNumber'>;
+  summary: EntityTable<{ summary: string }>;
 };
 
 // Schema declaration
@@ -13,6 +14,7 @@ db.version(1).stores({
   mpesaTransactions:
     '++id, transactionNo, transactionType, completionTime, details, isCharge, transactionStatus, paidIn, withdrawn, balance, counterPartyNumber',
   counterParties: '++id, counterPartyNumber, counterPartyName, accountNumber',
+  summary: 'summary', // Temporary :)
 });
 
 export { db };

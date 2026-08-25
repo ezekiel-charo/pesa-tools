@@ -23,7 +23,13 @@ export default function Upload() {
 
     try {
       const data = await processStatements(files);
-      db.mpesaTransactions.bulkAdd(data.transactions);
+      const transactions = data.transactions.map((txn) => {
+        delete txn.counterParty;
+        return txn;
+      });
+
+      db.mpesaTransactions.bulkAdd(transactions);
+      db.summary.add({ summary: JSON.stringify(data.summary) });
       navigate('insights');
     } catch (e) {
       setBtnDisabled(false);

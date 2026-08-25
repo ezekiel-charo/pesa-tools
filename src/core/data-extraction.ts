@@ -6,7 +6,7 @@ import type { StatementData } from '../types/statement-data';
 import {
   CASH_FLOW_TYPES,
   type CashFlowSummary,
-} from '../types/CashFlowSummary';
+} from '../types/cash-flow-summary';
 
 PDFParse.setWorker(
   'https://cdn.jsdelivr.net/npm/pdf-parse@latest/dist/pdf-parse/web/pdf.worker.mjs'
@@ -18,7 +18,7 @@ export async function extractStatementData(
   const parser = new PDFParse({ data: pdfFileData });
   const tableResult = await parser.getTable();
   const transactions: MpesaTransaction[] = [];
-  let summary: CashFlowSummary | null = null;
+  let summary = {} as CashFlowSummary;
 
   tableResult.pages.forEach((page, pageIndex) => {
     page.tables.forEach((table, tableIndex) => {
