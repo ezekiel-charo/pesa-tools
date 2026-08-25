@@ -1,21 +1,22 @@
 import { PDFParse } from 'pdf-parse';
-import type { CounterParty } from '../types/counter-party';
-import type { MpesaTransaction } from '../types/mpesa-transaction';
-import type { MpesaTransactionType } from '../types/mpesa-transaction-type';
-import type { StatementData } from '../types/statement-data';
 import {
   CASH_FLOW_TYPES,
   type CashFlowSummary,
 } from '../types/cash-flow-summary';
+import type { CounterParty } from '../types/counter-party';
+import type { MpesaTransaction } from '../types/mpesa-transaction';
+import type { MpesaTransactionType } from '../types/mpesa-transaction-type';
+import type { StatementData } from '../types/statement-data';
 
 PDFParse.setWorker(
   'https://cdn.jsdelivr.net/npm/pdf-parse@latest/dist/pdf-parse/web/pdf.worker.mjs'
 );
 
 export async function extractStatementData(
-  pdfFileData: ArrayBuffer
+  pdfFileData: ArrayBuffer,
+  password?: string
 ): Promise<StatementData> {
-  const parser = new PDFParse({ data: pdfFileData });
+  const parser = new PDFParse({ data: pdfFileData, password });
   const tableResult = await parser.getTable();
   const transactions: MpesaTransaction[] = [];
   let summary = {} as CashFlowSummary;
@@ -79,20 +80,6 @@ export function getCounterparty(details: string): CounterParty | undefined {
   return; // TODO: Implement
 }
 
-export function mergeSummaries(summaries: CashFlowSummary[]): CashFlowSummary {
-  const result = {} as CashFlowSummary;
-
-  for (const summary of summaries) {
-    for (const type of CASH_FLOW_TYPES) {
-      result[type] ??= { paidIn: 0, paidOut: 0 };
-      result[type].paidIn += summary[type].paidIn;
-      result[type].paidOut += summary[type].paidOut;
-    }
-  }
-
-  return result;
-}
-
 export function readFileAsync(file: File): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -109,21 +96,10 @@ export function readFileAsync(file: File): Promise<ArrayBuffer> {
   });
 }
 
-export async function processStatements(
-  files: FileList
+export async function processStatement(
+  file: File,
+  password?: string
 ): Promise<StatementData> {
-  const transactions: MpesaTransaction[] = [];
-  const summaries: CashFlowSummary[] = [];
-
-  for (const file of files) {
-    const fileData = await readFileAsync(file);
-    const data = await extractStatementData(fileData);
-    transactions.push(...data.transactions);
-    if (data.summary) {
-      summaries.push(data.summary);
-    }
-  }
-
-  const summary = mergeSummaries(summaries);
-  return { transactions, summary };
+  const fileData = await readFileAsync(file);
+  return extractStatementData(fileData, password);
 }
