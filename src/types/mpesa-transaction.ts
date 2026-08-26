@@ -1,4 +1,3 @@
-import type { CounterParty } from './counter-party';
 import type { MpesaTransactionType } from './mpesa-transaction-type';
 
 export interface MpesaTransaction {
@@ -7,16 +6,10 @@ export interface MpesaTransaction {
   transactionType: MpesaTransactionType;
   completionTime: number;
   details: string;
+  searchableStr: string;
   isCharge: boolean;
   transactionStatus: string;
-  paidIn: number | null;
-  withdrawn: number | null;
+  amount: number;
+  cashFlowDirection: 'PAID_IN' | 'PAID_OUT';
   balance: number;
-  counterPartyNumber?: string;
-  counterParty?: CounterParty;
 }
-
-export type MpesaBalance = Pick<
-  MpesaTransaction,
-  'transactionNo' | 'completionTime' | 'balance'
->;

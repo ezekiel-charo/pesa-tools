@@ -3,7 +3,6 @@ import {
   CASH_FLOW_TYPES,
   type CashFlowSummary,
 } from '../types/cash-flow-summary';
-import type { CounterParty } from '../types/counter-party';
 import type { MpesaTransaction } from '../types/mpesa-transaction';
 import type { MpesaTransactionType } from '../types/mpesa-transaction-type';
 import type { StatementData } from '../types/statement-data';
@@ -56,21 +55,26 @@ export async function extractStatementData(
           return;
         }
 
+        const { 0: transactionNo, 2: details, 3: transactionStatus } = row;
+        const isCharge = details.includes('Charge');
+        const paidIn = parseFloat(row[4].replace(/,/g, ''));
+        const amount = paidIn || parseFloat(row[5].replace(/,/g, ''));
+        const cashFlowDirection = paidIn ? 'PAID_IN' : 'PAID_OUT';
+        const searchableStr = `${transactionNo}${details}`.toLocaleLowerCase();
+        const transactionType = getTransactionType(row[2]);
+
         const txn = {
-          transactionNo: row[0],
+          transactionNo,
+          details,
+          isCharge,
+          amount,
+          cashFlowDirection,
+          transactionType,
+          searchableStr,
+          transactionStatus,
           completionTime: Date.parse(row[1]),
-          transactionType: getTransactionType(row[2]),
-          details: row[2],
-          isCharge: row[2].includes('Charge'),
-          transactionStatus: row[3],
-          paidIn: parseFloat(row[4].replace(/,/g, '')) || null,
-          withdrawn: parseFloat(row[5].replace(/,/g, '')) || null,
           balance: parseFloat(row[6].replace(/,/g, '')),
         } as MpesaTransaction;
-
-        const counterParty = getCounterparty(txn.details);
-        txn.counterParty = counterParty;
-        txn.counterPartyNumber = counterParty?.counterPartyNumber;
 
         transactions.push(txn);
       });
@@ -83,11 +87,6 @@ export async function extractStatementData(
 export function getTransactionType(details: string): MpesaTransactionType {
   if (details) return 'OTHER'; // TODO: Implement
   return 'OTHER';
-}
-
-export function getCounterparty(details: string): CounterParty | undefined {
-  if (details) return; // TODO: Implement
-  return;
 }
 
 export function readFileAsync(file: File): Promise<ArrayBuffer> {
