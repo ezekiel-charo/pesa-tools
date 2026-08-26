@@ -7,7 +7,7 @@ export function copyToClipboard(text: string): void {
   navigator.clipboard
     .writeText(text)
     .then(() => {
-      console.log('text copied:', text);
+      alert(`Text copied to clipboard: ${text}`);
     })
     .catch(() => {
       console.error('Failed to copy text:', text);
