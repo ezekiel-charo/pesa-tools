@@ -1,6 +1,6 @@
 import { ArrowPathIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
 import { PasswordException } from 'pdf-parse';
-import { useState, type ChangeEvent } from 'react';
+import { useState, type ChangeEvent, type DragEventHandler } from 'react';
 import { useNavigate } from 'react-router';
 import { processStatement } from '../core/data-extraction';
 import { db } from '../core/db';
@@ -10,8 +10,23 @@ import SelectedFileList from './SelectedFileList';
 export default function Upload() {
   const [btnDisabled, setBtnDisabled] = useState(true);
   const [files, setFiles] = useState<FileList | null>();
+  const [isDragging, setIsDragging] = useState(false);
 
   const navigate = useNavigate();
+
+  const handleDragOver: DragEventHandler<HTMLLabelElement> = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleFileDrop: DragEventHandler<HTMLLabelElement> = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer?.files) {
+      setFiles(e.dataTransfer.files);
+      setBtnDisabled(false);
+    }
+  };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
@@ -55,7 +70,14 @@ export default function Upload() {
 
   return (
     <>
-      <label className="mb-6 cursor-pointer inline-flex flex-col items-center mx-3 lg:w-120 p-6 rounded-lg border-2 border-dotted border-gray-700 bg-slate-100">
+      <label
+        onDragOver={handleDragOver}
+        onDrop={handleFileDrop}
+        className={
+          (isDragging || files?.length ? 'border-orange-800' : '') +
+          ' mb-6 cursor-pointer inline-flex flex-col items-center mx-3 lg:w-120 p-6 rounded-lg border-2 border-dotted border-gray-700 bg-slate-100'
+        }
+      >
         <CloudArrowUpIcon className="size-12 text-gray-500" />
         <div className="font-medium my-1 text-center">
           Click to choose or drag and drop your files
