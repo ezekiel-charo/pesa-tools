@@ -6,8 +6,8 @@ export default function MainLayout() {
   return (
     <>
       <Header />
-      <main className="max-w-3/5 mx-auto">
-        <div className="flex border-b border-gray-200 mt-8 *:py-2 *:px-4 text-sm font-medium">
+      <main className="lg:max-w-3/5 mx-3 lg:mx-auto">
+        <div className="flex border-b border-gray-200 lg:mt-8 *:py-2 *:px-4 text-sm font-medium">
           <NavLink
             to=""
             className={({ isActive }) =>
