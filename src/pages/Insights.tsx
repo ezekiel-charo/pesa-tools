@@ -11,8 +11,6 @@ export default function Insights() {
 
   const insights = JSON.parse(summary?.summary || '{}') as CashFlowSummary;
 
-  console.log(insights);
-
   return (
     <>
       <h2 className="font-bold mb-3 text-lg">Summary</h2>
