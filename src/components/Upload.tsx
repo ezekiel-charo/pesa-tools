@@ -50,6 +50,10 @@ export default function Upload() {
       db.summary.add({ summary: JSON.stringify(data.summary) });
       navigate('insights');
     } catch (error) {
+      if ((error as Error).cause === 'unrecognized-statement') {
+        alert('The chosen Pdf file might not be a valid Mpesa statement');
+      }
+
       if (error instanceof PasswordException) {
         const cause = error.cause as PasswordErrorCause;
         const promptMessage =

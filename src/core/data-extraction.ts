@@ -17,6 +17,16 @@ export async function extractStatementData(
   password?: string
 ): Promise<StatementData> {
   const parser = new PDFParse({ data: pdfFileData, password });
+
+  const pdfInfo = await parser.getInfo();
+  const pdfSubject = pdfInfo.info['Subject'];
+  if (pdfSubject !== 'M-PESA Statement') {
+    // Statement validation guard
+    throw new Error('Unrecognized mpesa statement', {
+      cause: 'unrecognized-statement',
+    });
+  }
+
   const tableResult = await parser.getTable();
   const transactions: MpesaTransaction[] = [];
   let summary = {} as CashFlowSummary;
@@ -71,13 +81,13 @@ export async function extractStatementData(
 }
 
 export function getTransactionType(details: string): MpesaTransactionType {
-  console.log(details);
-  return 'OTHER'; // TODO: Implement
+  if (details) return 'OTHER'; // TODO: Implement
+  return 'OTHER';
 }
 
 export function getCounterparty(details: string): CounterParty | undefined {
-  console.log(details);
-  return; // TODO: Implement
+  if (details) return; // TODO: Implement
+  return;
 }
 
 export function readFileAsync(file: File): Promise<ArrayBuffer> {
