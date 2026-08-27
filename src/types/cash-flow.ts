@@ -17,3 +17,5 @@ export const CASH_FLOW_TYPES = [
 export type CashFlowType = (typeof CASH_FLOW_TYPES)[number];
 
 export type CashFlowSummary = Record<CashFlowType, CashFlow>;
+
+export type CashFlowDirection = 'PAID_IN' | 'PAID_OUT';

@@ -1,97 +1,31 @@
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import { formatDate } from 'date-fns';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../core/db';
+import { getFilteredTransactions } from '../core/query';
 import { copyToClipboard, formatCurreny } from '../core/utils';
+import type {
+  FilterParams,
+  PaginationParams,
+  SortParams,
+} from '../types/filter-params';
 
 interface TransactionsListProps {
-  filter: {
-    transactionNo?: string | null;
-    cashFlowDirection?: 'PAID_IN' | 'PAID_OUT' | null;
-    fromDate?: string | null;
-    toDate?: string | null;
-    amountAbove?: number | null;
-    amountBelow?: number | null;
-    balanceAbove?: number | null;
-    balanceBelow?: number | null;
-  };
-  sort: { by: string; direction: 'ASC' | 'DESC' };
+  filters: FilterParams;
+  sort: SortParams;
   search?: string;
-  paginator: { pageIndex: number; pageSize: number };
+  pagination: PaginationParams;
 }
 
 export default function TransactionsList({
-  filter,
+  filters,
   sort,
+  pagination,
   search,
-  paginator,
 }: TransactionsListProps) {
   const transactions = useLiveQuery(async () => {
-    const normalizedSearch = search?.toLocaleLowerCase().trim();
-    const fromDate = filter.fromDate ? Date.parse(filter.fromDate) : undefined;
-    const toDate = filter.toDate ? Date.parse(filter.toDate) : undefined;
-
-    const filtered = db.mpesaTransactions
-      .orderBy(sort.by)
-      .filter((txn) => {
-        if (
-          normalizedSearch &&
-          !`${txn.transactionNo}${txn.details}`
-            .toLocaleLowerCase()
-            .includes(normalizedSearch)
-        ) {
-          return false;
-        }
-
-        if (
-          filter.cashFlowDirection != null &&
-          txn.cashFlowDirection !== filter.cashFlowDirection
-        ) {
-          return false;
-        }
-
-        if (
-          filter.transactionNo != null &&
-          txn.transactionNo !== filter.transactionNo
-        ) {
-          return false;
-        }
-
-        if (fromDate != null && txn.completionTime <= fromDate) {
-          return false;
-        }
-
-        if (toDate != null && txn.completionTime >= toDate) {
-          return false;
-        }
-
-        if (filter.amountAbove != null && txn.amount <= filter.amountAbove) {
-          return false;
-        }
-
-        if (filter.amountBelow != null && txn.amount >= filter.amountBelow) {
-          return false;
-        }
-
-        if (filter.balanceAbove != null && txn.balance <= filter.balanceAbove) {
-          return false;
-        }
-
-        if (filter.balanceBelow != null && txn.balance >= filter.balanceBelow) {
-          return false;
-        }
-
-        return true;
-      })
-      .offset(paginator.pageIndex * paginator.pageSize)
-      .limit(paginator.pageSize);
-
-    if (sort.direction === 'DESC') {
-      return filtered.reverse().toArray();
-    }
-
-    return filtered.toArray();
-  }, [filter, sort, search, paginator]);
+    const filtered = getFilteredTransactions(filters, sort, pagination, search);
+    return filtered.limit(pagination.pageSize).toArray();
+  }, [filters, sort, pagination, search]);
 
   return (
     <>
@@ -128,8 +62,7 @@ export default function TransactionsList({
                 : 'text-red-700') + ' text-end! font-semibold'
             }
           >
-            {(transaction.cashFlowDirection === 'PAID_IN' ? '+ ' : '- ') +
-              formatCurreny(transaction.amount)}
+            {formatCurreny(transaction.amount)}
           </td>
           <td className="text-end! font-semibold">
             {formatCurreny(transaction.balance)}

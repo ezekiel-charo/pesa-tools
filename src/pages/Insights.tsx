@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import StatCard from '../components/StatCard';
 import { db } from '../core/db';
-import type { CashFlowSummary } from '../types/cash-flow-summary';
+import type { CashFlowSummary } from '../types/cash-flow';
 
 export default function Insights() {
   // Temp implementation

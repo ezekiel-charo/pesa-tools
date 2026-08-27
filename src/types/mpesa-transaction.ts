@@ -1,3 +1,4 @@
+import type { CashFlowDirection } from './cash-flow';
 import type { MpesaTransactionType } from './mpesa-transaction-type';
 
 export interface MpesaTransaction {
@@ -10,6 +11,6 @@ export interface MpesaTransaction {
   isCharge: boolean;
   transactionStatus: string;
   amount: number;
-  cashFlowDirection: 'PAID_IN' | 'PAID_OUT';
+  cashFlowDirection: CashFlowDirection;
   balance: number;
 }
