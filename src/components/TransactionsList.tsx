@@ -2,7 +2,7 @@ import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import { formatDate } from 'date-fns';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { getFilteredTransactions } from '../core/query';
-import { copyToClipboard, formatCurreny } from '../core/utils';
+import { copyToClipboard, formatNumber } from '../core/utils';
 import type {
   FilterParams,
   PaginationParams,
@@ -23,8 +23,12 @@ export default function TransactionsList({
   search,
 }: TransactionsListProps) {
   const transactions = useLiveQuery(async () => {
-    const filtered = getFilteredTransactions(filters, sort, pagination, search);
-    return filtered.limit(pagination.pageSize).toArray();
+    const pageIndex = pagination.pageNo - 1;
+    const filtered = getFilteredTransactions(filters, sort, search);
+    return filtered
+      .offset(pageIndex * pagination.pageSize)
+      .limit(pagination.pageSize)
+      .toArray();
   }, [filters, sort, pagination, search]);
 
   return (
@@ -62,10 +66,10 @@ export default function TransactionsList({
                 : 'text-red-700') + ' text-end! font-semibold'
             }
           >
-            {formatCurreny(transaction.amount)}
+            {formatNumber(transaction.amount)}
           </td>
           <td className="text-end! font-semibold">
-            {formatCurreny(transaction.balance)}
+            {formatNumber(transaction.balance)}
           </td>
         </tr>
       ))}

@@ -1,7 +1,7 @@
 import * as ExcelJS from 'exceljs';
 import type { MpesaTransaction } from '../types/mpesa-transaction';
 
-export function formatCurreny(value?: number | null): string {
+export function formatNumber(value?: number | null): string {
   if (!value && value !== 0) return '';
   return new Intl.NumberFormat().format(Math.abs(value));
 }

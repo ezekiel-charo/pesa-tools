@@ -3,9 +3,11 @@ import {
   ChevronUpDownIcon,
   FunnelIcon,
 } from '@heroicons/react/24/outline';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Dropdown } from '../components/DropDown';
 import FiltersDropdown from '../components/FiltersDropdown';
+import Paginator from '../components/Paginator';
 import SortDropdown from '../components/SortDropdown';
 import TransactionsList from '../components/TransactionsList';
 import { DEFAULT_PAGINATION, DEFUALT_SORTING } from '../core/constants';
@@ -25,12 +27,15 @@ export default function Transactions() {
     const transactions = await getFilteredTransactions(
       filters,
       sort,
-      pagination,
       search
     ).toArray();
 
     exportToXlsx(transactions);
   };
+
+  const totalItems = useLiveQuery(() => {
+    return getFilteredTransactions(filters, sort, search).count();
+  }, [filters, sort, search]);
 
   return (
     <>
@@ -108,6 +113,12 @@ export default function Transactions() {
             />
           </tbody>
         </table>
+        <Paginator
+          pageNo={pagination.pageNo}
+          pageSize={pagination.pageSize}
+          totalItems={totalItems}
+          onPageChange={setPagination}
+        />
       </div>
     </>
   );

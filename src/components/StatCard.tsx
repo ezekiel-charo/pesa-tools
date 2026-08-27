@@ -1,4 +1,4 @@
-import { formatCurreny } from '../core/utils';
+import { formatNumber } from '../core/utils';
 
 interface StatCardProps {
   cardTitle: string;
@@ -10,7 +10,7 @@ export default function StatCard({ cardTitle, amount }: StatCardProps) {
     <div className="border border-gray-200 bg-gray-100 rounded-lg p-3">
       <div className="font-medium text-xs text-gray-600">{cardTitle}</div>
       <div className="font-extrabold text-lg text-gray-800">
-        {formatCurreny(amount)}
+        {formatNumber(amount)}
       </div>
     </div>
   );
