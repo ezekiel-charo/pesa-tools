@@ -41,12 +41,7 @@ export default function Upload() {
 
     try {
       const data = await processStatement(files[0], password);
-      const transactions = data.transactions.map((txn) => {
-        delete txn.counterParty;
-        return txn;
-      });
-
-      db.mpesaTransactions.bulkAdd(transactions);
+      db.mpesaTransactions.bulkAdd(data.transactions);
       db.summary.add({ summary: JSON.stringify(data.summary) });
       navigate('insights');
     } catch (error) {
