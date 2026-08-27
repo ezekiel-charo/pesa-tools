@@ -56,7 +56,7 @@ export async function extractStatementData(
         const isCharge = details.includes('Charge');
         const paidIn = parseFloat(row[4].replace(/,/g, ''));
         const amount =
-          paidIn != null ? paidIn : parseFloat(row[5].replace(/,/g, ''));
+          paidIn == 0 ? paidIn : parseFloat(row[5].replace(/,/g, ''));
         const cashFlowDirection = paidIn ? 'PAID_IN' : 'PAID_OUT';
         const searchableStr = `${transactionNo}${details}`.toLocaleLowerCase();
         const transactionType = getTransactionType(row[2]);
