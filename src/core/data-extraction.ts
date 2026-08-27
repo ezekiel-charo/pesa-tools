@@ -1,8 +1,5 @@
 import { PDFParse } from 'pdf-parse';
-import {
-  CASH_FLOW_TYPES,
-  type CashFlowSummary,
-} from '../types/cash-flow-summary';
+import { CASH_FLOW_TYPES, type CashFlowSummary } from '../types/cash-flow';
 import type { MpesaTransaction } from '../types/mpesa-transaction';
 import type { MpesaTransactionType } from '../types/mpesa-transaction-type';
 import type { StatementData } from '../types/statement-data';
@@ -58,7 +55,8 @@ export async function extractStatementData(
         const { 0: transactionNo, 2: details, 3: transactionStatus } = row;
         const isCharge = details.includes('Charge');
         const paidIn = parseFloat(row[4].replace(/,/g, ''));
-        const amount = paidIn || parseFloat(row[5].replace(/,/g, ''));
+        const amount =
+          paidIn != null ? paidIn : parseFloat(row[5].replace(/,/g, ''));
         const cashFlowDirection = paidIn ? 'PAID_IN' : 'PAID_OUT';
         const searchableStr = `${transactionNo}${details}`.toLocaleLowerCase();
         const transactionType = getTransactionType(row[2]);
