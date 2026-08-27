@@ -13,7 +13,7 @@ export default function FiltersDropdown({
 
   return (
     <>
-      <div className="w-80 p-4">
+      <div className="w-80 p-4 text-sm">
         <h3 className="font-bold mb-3 text-base">Filter</h3>
         <div className="mb-3">
           <label htmlFor="transaction-no" className="block mb-1">
