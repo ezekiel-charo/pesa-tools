@@ -4,23 +4,22 @@ import {
   FunnelIcon,
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
+import { Dropdown } from '../components/DropDown';
+import FiltersDropdown from '../components/FiltersDropdown';
+import SortDropdown from '../components/SortDropdown';
 import TransactionsList from '../components/TransactionsList';
-import { exportToXlsx } from '../core/utils';
-import type {
-  FilterParams,
-  PaginationParams,
-  SortParams,
-} from '../types/filter-params';
+import { DEFAULT_PAGINATION, DEFUALT_SORTING } from '../core/constants';
 import { getFilteredTransactions } from '../core/query';
-
-const DEFUALT_SORTING: SortParams = { by: 'completionTime', direction: 'DESC' };
-const DEFAULT_PAGINATION: PaginationParams = { pageNo: 1, pageSize: 10 };
+import { exportToXlsx } from '../core/utils';
+import type { FilterParams } from '../types/filter-params';
 
 export default function Transactions() {
   const [search, setSearch] = useState<string>();
   const [filters, setFilters] = useState<FilterParams>({});
   const [sort, setSort] = useState(DEFUALT_SORTING);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
+  const [sortDropdownOpened, setSortDropdownOpened] = useState(false);
+  const [filtersDropdownOpened, setFiltersDropdownOpened] = useState(false);
 
   const exportTransactions = async () => {
     const transactions = await getFilteredTransactions(
@@ -38,17 +37,49 @@ export default function Transactions() {
       <div className="flex items-center justify-between mb-3">
         <input
           type="search"
-          placeholder="Search names, transaction number, etc."
+          placeholder="Search transaction number or details..."
           className="w-80 bg-white border border-gray-300 outline-green-600 rounded-lg py-2 px-4"
           onChange={(e) => setSearch(e.target.value)}
         />
         <div className="flex items-center gap-2">
-          <button className="inline-flex items-center gap-1 border border-gray-300 text-sm text-primary py-2 px-4 rounded-lg font-medium cursor-pointer">
-            <FunnelIcon className="size-4" /> Filter
-          </button>
-          <button className="inline-flex items-center gap-1 border border-gray-300 text-sm text-primary py-2 px-4 rounded-lg font-medium cursor-pointer">
-            <ChevronUpDownIcon className="size-4" /> Sort
-          </button>
+          <Dropdown
+            opened={filtersDropdownOpened}
+            onClose={() => setFiltersDropdownOpened(false)}
+            content={
+              <FiltersDropdown
+                applyFilters={(f) => {
+                  setFilters(f);
+                  setFiltersDropdownOpened(false);
+                }}
+              />
+            }
+          >
+            <button
+              onClick={() => setFiltersDropdownOpened(true)}
+              className="inline-flex items-center gap-1 border border-gray-300 text-sm text-primary py-2 px-4 rounded-lg font-medium cursor-pointer"
+            >
+              <FunnelIcon className="size-4" /> Filter
+            </button>
+          </Dropdown>
+          <Dropdown
+            opened={sortDropdownOpened}
+            onClose={() => setSortDropdownOpened(false)}
+            content={
+              <SortDropdown
+                applySort={(s) => {
+                  setSort(s);
+                  setSortDropdownOpened(false);
+                }}
+              />
+            }
+          >
+            <button
+              onClick={() => setSortDropdownOpened(true)}
+              className="inline-flex items-center gap-1 border border-gray-300 text-sm text-primary py-2 px-4 rounded-lg font-medium cursor-pointer"
+            >
+              <ChevronUpDownIcon className="size-4" /> Sort
+            </button>
+          </Dropdown>
           <button
             onClick={exportTransactions}
             className="inline-flex items-center gap-1 bg-primary text-sm text-white py-2 px-4 rounded-lg font-medium cursor-pointer"

@@ -11,9 +11,11 @@ export interface FilterParams {
   balanceBelow?: number | null;
 }
 
+export type SortDirection = 'ASC' | 'DESC';
+
 export interface SortParams {
   by: string;
-  direction: 'ASC' | 'DESC';
+  direction: SortDirection;
 }
 
 export interface PaginationParams {

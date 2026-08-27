@@ -29,6 +29,7 @@ export function getFilteredTransactions(
       }
 
       if (
+        filters.cashFlowDirection &&
         filters.cashFlowDirection != null &&
         txn.cashFlowDirection !== filters.cashFlowDirection
       ) {
@@ -73,8 +74,6 @@ export function getFilteredTransactions(
   if (sort.direction === 'DESC') {
     filtered = filtered.reverse();
   }
-
-  filtered.toArray().then(console.log);
 
   return filtered;
 }
