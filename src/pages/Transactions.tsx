@@ -5,7 +5,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
-import { Dropdown } from '../components/DropDown';
+import Dropdown from '../components/Dropdown';
 import FiltersDropdown from '../components/FiltersDropdown';
 import Paginator from '../components/Paginator';
 import SortDropdown from '../components/SortDropdown';

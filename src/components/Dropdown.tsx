@@ -7,7 +7,7 @@ interface DropdownProps {
   onClose: (f: false) => void;
 }
 
-export function Dropdown({
+export default function Dropdown({
   opened,
   onClose,
   children,
