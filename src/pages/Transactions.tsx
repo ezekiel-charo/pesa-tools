@@ -39,11 +39,11 @@ export default function Transactions() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex flex-col-reverse gap-2 items-end lg:flex-row lg:items-center lg:justify-between mb-3">
         <input
           type="search"
           placeholder="Search transaction number or details..."
-          className="w-80 bg-white border border-gray-300 outline-green-600 rounded-lg py-2 px-4"
+          className="w-full lg:w-80 bg-white border border-gray-300 outline-green-600 rounded-lg py-2 px-4"
           onChange={(e) => setSearch(e.target.value)}
         />
         <div className="flex items-center gap-2">

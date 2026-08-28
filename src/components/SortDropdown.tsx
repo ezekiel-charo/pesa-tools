@@ -18,7 +18,7 @@ export default function SortDropdown({ applySort }: SortDropdownProps) {
 
   return (
     <>
-      <div className="w-60 p-4 text-sm">
+      <div className="w-full lg:w-60 p-4 text-sm">
         <h3 className="font-bold mb-3 text-base">Sort</h3>
         <div className="mb-3">
           <label htmlFor="column" className="block mb-1">

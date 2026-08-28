@@ -18,7 +18,7 @@ export function Dropdown({
       <>
         <div className="relative">
           {children}
-          <div className="absolute right-0 bg-white shadow rounded-md z-50">
+          <div className="fixed left-2 right-2 lg:absolute lg:left-[unset] lg:right-0 bg-white shadow rounded-md z-50">
             {content}
           </div>
         </div>
